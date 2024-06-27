@@ -20,10 +20,10 @@ const Page = () => {
     try {
       const provider = await w0?.getEthersProvider();
       const signer = await provider?.getSigner();
-      // const contractOwnerSafe = await deploySafe(signer);
-      // const contractBobSafe = await deploySafe(signer);
-      // const contractCarolSafe = await deploySafe(signer);
-      // const contractDaveSafe = await deploySafe(signer);
+      const contractOwnerSafe = await deploySafe(signer);
+      const contractBobSafe = await deploySafe(signer);
+      const contractCarolSafe = await deploySafe(signer);
+      const contractDaveSafe = await deploySafe(signer);
       const contractERC20 = await deployERC20(signer);
       console.log(contractERC20.contractAddress)
       const contractEncryptedERC20 = await deployEncryptedERC20(
@@ -32,10 +32,10 @@ const Page = () => {
       );
 
       console.log(
-        // contractOwnerSafe,
-        // contractBobSafe,
-        // contractCarolSafe,
-        // contractDaveSafe,
+        contractOwnerSafe,
+        contractBobSafe,
+        contractCarolSafe,
+        contractDaveSafe,
         contractERC20,
         contractEncryptedERC20
       );
