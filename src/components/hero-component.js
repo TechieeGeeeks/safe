@@ -14,16 +14,16 @@ const HeroComponent = () => {
     <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="flex flex-col items-center gap-4">
         <div className="grid scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
-          <p>Technical Vidya</p>
-          <p>We Bring Your skills to Life!</p>
+          <p>Secure Contract </p>
+          <p>Interactions with FHEVMJS!</p>
         </div>
         <p className="max-w-[700px] w-full text-muted-foreground text-center">
-          Where does it come from? Contrary to popular belief, Lorem Ipsum is
-          not simply random text. It has roots in a piece of classical Latin
-          literature from 45 BC, making it over 2000 years old. Richard
-          McClintock, a Latin professor at Hampden-Sydney College in Virginia,
-          looked up one of the more obscure Latin words, consectetur, from a
-          Lorem Ipsum passage
+          Enhance the security of your smart contract interactions by
+          integrating FHEVMJS. This integration allows you to manage encrypted
+          ERC20 tokens seamlessly, ensuring that your data is handled securely
+          at all stages. With FHEVMJS, you can create FHEVM instances to
+          interact with encrypted tokens, utilizing public keys for encrypting
+          and decrypting transactions.
         </p>
       </div>
 
