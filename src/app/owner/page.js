@@ -19,13 +19,15 @@ const Page = () => {
   const { wallets } = useWallets();
   const w0 = wallets[0];
   const accountAddress = w0?.address?.slice(0, 6)?.toLocaleLowerCase();
-  let instance;
-  useEffect(() => {
-    async function fetchInstance() {
-      instance = await getInstance();
-    }
-    fetchInstance();
-  }, []);
+  // let fhevmInstance;
+  // useEffect(() => {
+  //   async function fetchInstance() {
+  //     fhevmInstance = await getInstance();
+  //     console.log(fhevmInstance);
+  //   }
+  //   fetchInstance();
+  // }, []);
+
   const deployErc20Token = async () => {
     try {
       const provider = await w0?.getEthersProvider();
@@ -54,21 +56,21 @@ const Page = () => {
       console.log("dave safe address: " + addressDaveSafe);
       console.log("erc20 address: " + addressERC20);
       console.log("encrypted erc20 address: " + addressEncryptedERC20);
-      // const addressOwnerSafe = "0x21620F0253a26D16408Dc5265a234A2CE27B7bfa";
-      // const addressBobSafe = "0x84032C9F3e6ABb10D772f9Dc9783243f972C91F7";
-      // const addressCarolSafe = "0xe48bfEA5419e54EE22EF4Dc02a8a98188fb796f1";
-      // const addressDaveSafe = "0x9234A3854C5360ebe47e5A764cAc72d4ad93eE82";
-      // const addressERC20 = "0xA58348Bd8D1ac9621a0Ef6B2dF1E4425024C1dc8";
-      // const addressEncryptedERC20 =
-      //   "0x718d4f4ca260ac8Bdaaf36109DF04EFbb2931fBB";
+
+      const fhevmInstance = await getInstance();
+      const token = fhevmInstance.getPublicKey(addressEncryptedERC20) || {
+        signature: "",
+        publicKey: "",
+      };
+      console.log(token);
+
+      toast.success(
+        " Initializing Safe contract (setting up an owner of the safe)"
+      );
 
       let fnSelector = "0x0d582f13";
       toast("Initializing Safe contract (setting up an owner of the safe");
 
-      const encryptedAddres = await defaultAbiCoder.encode(
-        ["string", "uint256"],
-        [accountAddress, 1]
-      );
       console.log(encryptedAddres);
 
       const ownerSafeContract = new Contract(addressOwnerSafe, safeabi, signer);
@@ -76,7 +78,10 @@ const Page = () => {
         const txn = await ownerSafeContract.execTransaction(
           addressOwnerSafe,
           0,
-          fnSelector + encryptedAddres.slice(2),
+          fnSelector +
+            defaultAbiCoder
+              .encode(["string", "uint256"], [accountAddress, 1])
+              .slice(2),
           0,
           1000000,
           0,
@@ -85,8 +90,10 @@ const Page = () => {
           addressOwnerSafe,
           "0x"
         );
-
+        await txn.wait(1);
         console.log(txn);
+        toast.success("Owner safe initialization successful!");
+        toast.success("Bob Needs to sign the transaction now!");
       } catch (error) {
         console.log(error);
         toast.error("Error Occured!");
@@ -97,7 +104,10 @@ const Page = () => {
         const txn = await bobSafeContract.execTransaction(
           addressBobSafe,
           0,
-          fnSelector + encryptedAddres.slice(2),
+          fnSelector +
+            defaultAbiCoder
+              .encode(["string", "uint256"], [accountAddress, 1])
+              .slice(2),
           0,
           1000000,
           0,
@@ -106,7 +116,7 @@ const Page = () => {
           addressBobSafe,
           "0x"
         );
-
+        await txn.wait(1);
         console.log(txn);
       } catch (error) {
         console.log(error);
@@ -129,6 +139,7 @@ const Page = () => {
         );
 
         console.log(txn);
+        await txn.wait(1);
       } catch (error) {
         console.log(error);
         toast.error("Error Occured!");
@@ -150,6 +161,7 @@ const Page = () => {
         );
 
         console.log(txn);
+        await txn.wait(1);
       } catch (error) {
         console.log(error);
         toast.error("Error Occured!");
@@ -162,10 +174,17 @@ const Page = () => {
         const txn = await erc20contract.mint(addressOwnerSafe, 1000000);
 
         console.log(txn);
+        await txn.wait(1);
       } catch (error) {
         console.log(error);
         toast.error("Error Occured!");
       }
+
+      const encryptederc20Contract = new Contract(
+        addressEncryptedERC20,
+        encryptederc20abi,
+        signer
+      );
 
       try {
         let fnSelector = "0x095ea7b3";
@@ -199,31 +218,127 @@ const Page = () => {
         addressEncryptedERC20
       );
       console.log(allowance);
-      // const erc20contract = new Contract(addressERC20, erc20abi, signer);
-      // try {
-      //   let fnSelector = "0x095ea7b3";
-      //   const txn = await ownerSafeContract.execTransaction(
-      //     addressERC20,
-      //     0,
-      //     fnSelector +
-      //       defaultAbiCoder
-      //         .encode(["string", "uint256"], [addressEncryptedERC20, 1000000])
-      //         .slice(2),
-      //     0,
-      //     1000000,
-      //     0,
-      //     1000000,
-      //     addressOwnerSafe,
-      //     addressOwnerSafe,
-      //     "0x"
-      //   );
 
-      //   console.log(txn);
-      //   toast("Now you can transfer tokens to the other safes");
-      // } catch (error) {
-      //   console.log(error);
-      //   toast.error("Error Occured!");
-      // }
+      toast.success(
+        "Distributing 10_000, 30_000, 960_000 tokens to Bob, Carol, Dave safes respectively\n"
+      );
+      const amount = 1000000;
+      const data1 = [addressBobSafe, fhevmInstance.encrypt32(10000)];
+      const data2 = [addressCarolSafe, fhevmInstance.encrypt32(30000)];
+      const data3 = [addressDaveSafe, fhevmInstance.encrypt32(960000)];
+      const depositData = [data1, data2, data3];
+
+      // // Encode the data
+      const encodedData1 = defaultAbiCoder.encode(
+        ["tuple(address,bytes)[]"],
+        [depositData]
+      );
+
+      const encodedData2 = defaultAbiCoder.encode(
+        ["uint256", "bytes"],
+        [amount, encodedData1]
+      );
+
+      console.log(encodedData1, encodedData2);
+      try {
+        const txn = await ownerSafeContract.execTransaction(
+          addressEncryptedERC20,
+          0,
+          fnSelector + encodedData2.slice(2), //doubt
+          // "0xc6dad082",
+          0,
+          1000000,
+          0,
+          // 1000000,
+          0,
+          addressOwnerSafe,
+          addressOwnerSafe,
+          "0x",
+          { gasLimit: 7920027 }
+        );
+        console.log(txn);
+        // await txn.wait(1);
+      } catch (error) {
+        console.log(error);
+      }
+
+      let claimFnSelector = "0x4e71d92d";
+      try {
+        const txn = await bobSafeContract.execTransaction(
+          addressEncryptedERC20,
+          0,
+          claimFnSelector,
+          // "0xc6dad082",
+          0,
+          1000000,
+          0,
+          // 1000000,
+          0,
+          addressOwnerSafe,
+          addressOwnerSafe,
+          "0x"
+        );
+        console.log(txn);
+        // await txn.wait(1);
+      } catch (error) {
+        console.log(error);
+      }
+      // console.log("here");
+
+      try {
+        const txn = await carelSafeContract.execTransaction(
+          addressEncryptedERC20,
+          0,
+          claimFnSelector,
+          // "0xc6dad082",
+          0,
+          1000000,
+          0,
+          // 1000000,
+          0,
+          addressOwnerSafe,
+          addressOwnerSafe,
+          "0x"
+        );
+        console.log(txn);
+        // await txn.wait(1);
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        const txn = await daveSafeContract.execTransaction(
+          addressEncryptedERC20,
+          0,
+          claimFnSelector,
+          // "0xc6dad082",
+          0,
+          1000000,
+          0,
+          // 1000000,
+          0,
+          addressOwnerSafe,
+          addressOwnerSafe,
+          "0x"
+        );
+        console.log(txn);
+        // await txn.wait(1);
+      } catch (error) {
+        console.log(error);
+      }
+
+      console.log(
+        "Final ERC20 balance of Bob Safe: " +
+          (await contractERC20.balanceOf(addressBobSafe))
+      );
+      console.log(
+        "Final ERC20 balance of Carol Safe: " +
+          (await contractERC20.balanceOf(addressCarolSafe))
+      );
+      console.log(
+        "Final ERC20 balance of Dave Safe: " +
+          (await contractERC20.balanceOf(addressDaveSafe))
+      );
     } catch (error) {
       console.error(error);
     }
@@ -269,6 +384,18 @@ const Page = () => {
           <div className="">
             <Button onClick={deployErc20Token} className="w-full">
               Deploy ERC token
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-6 items-center justify-center">
+          <div className="col-span-5">
+            <p className="font-semibold text-xl"> Step 2: </p>
+            <p className="text-muted-foreground">Sign as Bob</p>
+          </div>
+          <div className="">
+            <Button onClick={deployErc20Token} className="w-full">
+              Sign
             </Button>{" "}
           </div>
         </div>
