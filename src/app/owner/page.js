@@ -1,26 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  deployerABIBytecode,
-  encryptederc20abi,
-  encryptederc20bytecode,
-  erc20abi,
-  erc20bytecode,
-  safeabi,
-  safebytecode,
-} from "@/contracts/data";
+import { encryptederc20abi, erc20abi, safeabi } from "@/contracts/data";
 import { getInstance } from "@/utils/fhevm";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { Contract, ContractFactory, ethers } from "ethers";
+import { Contract } from "ethers";
 import { defaultAbiCoder } from "ethers/lib/utils";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import deployerABI from "@/abis/deployer.json";
 import {
   buildSafeTransaction,
   buildSignatureBytes,
   safeApproveHash,
 } from "@/utils/utility";
+import { CheckBalance } from "@/components/checkbalance";
+import { AddAddress } from "@/components/AddAddresses";
 
 const Page = () => {
   const { authenticated, ready } = usePrivy();
@@ -33,21 +26,37 @@ const Page = () => {
   const [contractDaveSafe, setContractDaveSafe] = useState(null);
   const [contractERC20, setContractERC20] = useState(null);
   const [contractEncryptedERC20, setContractEncryptedERC20] = useState(null);
-  const accountAddress = w0?.address?.slice(0, 6)?.toLocaleLowerCase();
 
-  //   owner safe address: 0xD543bA793b37ebB2e91F259ff842591F8b615c44
-  // bob safe address: 0x0FFC127F9e4fFBbf9086602905204Ea7cF5B5A97
-  // carol safe address: 0x5B3A40338d7ccA4f551e523543360ADa17b9AaB4
-  // dave safe address: 0x3CfA76a8eE3DADE60dcEaA0D412E7EDA00A6ab8f
-  // erc20 address: 0xa095308F69c5e9076818D0530d1b89b31497CF5E
-  // encrypted erc20 address: 0xA13cB51D908d61cd8e65E8B4f2Ccc4776e725A5f
+  const [addressOwnerSafe, setAddressOwnerSafe] = useState(
+    "0xD543bA793b37ebB2e91F259ff842591F8b615c44"
+  );
+  const [addressBobSafe, setAddressBobSafe] = useState(
+    "0x0FFC127F9e4fFBbf9086602905204Ea7cF5B5A97"
+  );
+  const [addressCarolSafe, setAddressCarolSafe] = useState(
+    "0x5B3A40338d7ccA4f551e523543360ADa17b9AaB4"
+  );
+  const [addressDaveSafe, setAddressDaveSafe] = useState(
+    "0x3CfA76a8eE3DADE60dcEaA0D412E7EDA00A6ab8f"
+  );
+  const [addressERC20, setAddressERC20] = useState(
+    "0xa095308F69c5e9076818D0530d1b89b31497CF5E"
+  );
+  const [addressEncryptedERC20, setAddressEncryptedERC20] = useState(
+    "0xA13cB51D908d61cd8e65E8B4f2Ccc4776e725A5f"
+  );
 
-  const addressOwnerSafe = "0xD543bA793b37ebB2e91F259ff842591F8b615c44";
-  const addressBobSafe = "0x0FFC127F9e4fFBbf9086602905204Ea7cF5B5A97";
-  const addressCarolSafe = "0x5B3A40338d7ccA4f551e523543360ADa17b9AaB4";
-  const addressDaveSafe = "0x3CfA76a8eE3DADE60dcEaA0D412E7EDA00A6ab8f";
-  const addressERC20 = "0xa095308F69c5e9076818D0530d1b89b31497CF5E";
-  const addressEncryptedERC20 = "0xA13cB51D908d61cd8e65E8B4f2Ccc4776e725A5f";
+  const handleChange = (setter, e) => {
+    console.log(e.target.value);
+    setter(e.target.value);
+  };
+
+  // const addressOwnerSafe = "0xD543bA793b37ebB2e91F259ff842591F8b615c44";
+  // const addressBobSafe = "0x0FFC127F9e4fFBbf9086602905204Ea7cF5B5A97";
+  // const addressCarolSafe = "0x5B3A40338d7ccA4f551e523543360ADa17b9AaB4";
+  // const addressDaveSafe = "0x3CfA76a8eE3DADE60dcEaA0D412E7EDA00A6ab8f";
+  // const addressERC20 = "0xa095308F69c5e9076818D0530d1b89b31497CF5E";
+  // const addressEncryptedERC20 = "0xA13cB51D908d61cd8e65E8B4f2Ccc4776e725A5f";
 
   const getContracts = async () => {
     const provider = await w0?.getEthersProvider();
@@ -86,88 +95,6 @@ const Page = () => {
     addressEncryptedERC20,
   };
 
-  const checkBalance = async () => {
-    try {
-      const ownerSafeBalance = await contractERC20.balanceOf(addressOwnerSafe);
-      const bobSafeBalance = await contractERC20.balanceOf(addressBobSafe);
-      const carolSafeBalance = await contractERC20.balanceOf(addressCarolSafe);
-      const daveSafeBalance = await contractERC20.balanceOf(addressDaveSafe);
-      const approval = await contractERC20.getallowance(
-        addressOwnerSafe,
-        addressEncryptedERC20
-      );
-      const encryptedERC20Balance = await contractERC20.balanceOf(
-        addressEncryptedERC20
-      );
-
-      console.log("Owner Safe Balance: ", ownerSafeBalance.toString());
-      console.log("Bob Safe Balance: ", bobSafeBalance.toString());
-      console.log("Carol Safe Balance: ", carolSafeBalance.toString());
-      console.log("Dave Safe Balance: ", daveSafeBalance.toString());
-      console.log("Approval: ", approval.toString());
-      console.log("encryptedERC20Balance: ", encryptedERC20Balance.toString());
-    } catch (error) {
-      console.error("Error checking balance: ", error);
-    }
-  };
-
-  const deployErc20Token = async () => {
-    try {
-      const provider = await w0?.getEthersProvider();
-      const signer = await provider?.getSigner();
-
-      console.log("owner safe address: " + addressOwnerSafe);
-      console.log("bob safe address: " + addressBobSafe);
-      console.log("carol safe address: " + addressCarolSafe);
-      console.log("dave safe address: " + addressDaveSafe);
-      console.log("erc20 address: " + addressERC20);
-      console.log("encrypted erc20 address: " + addressEncryptedERC20);
-
-      // const fhevmInstance = await getInstance();
-      // const token = fhevmInstance.getPublicKey(addressEncryptedERC20) || {
-      //   signature: "",
-      //   publicKey: "",
-      // };
-      // console.log(token);
-
-      // toast.success(
-      //   " Initializing Safe contract (setting up an owner of the safe)"
-      // );
-
-      // let fnSelector = "0x0d582f13";
-      // toast("Initializing Safe contract (setting up an owner of the safe");
-
-      // console.log(encryptedAddres);
-
-      // const ownerSafeContract = new Contract(addressOwnerSafe, safeabi, signer);
-      // try {
-      //   const txn = await ownerSafeContract.execTransaction(
-      //     addressOwnerSafe,
-      //     0,
-      //     fnSelector +
-      //       defaultAbiCoder
-      //         .encode(["string", "uint256"], [accountAddress, 1])
-      //         .slice(2),
-      //     0,
-      //     1000000,
-      //     0,
-      //     1000000,
-      //     addressOwnerSafe,
-      //     addressOwnerSafe,
-      //     "0x"
-      //   );
-      //   await txn.wait(1);
-      //   console.log(txn);
-      //   toast.success("Owner safe initialization successful!");
-      //   toast.success("Bob Needs to sign the transaction now!");
-      // } catch (error) {
-      //   console.log(error);
-      //   toast.error("Error Occured!");
-      // }
-    } catch (error) {
-      console.error(error);
-    }
-  };
   const promise = () =>
     new Promise((resolve) =>
       setTimeout(() => resolve(setShowLogs(true)), 10000)
@@ -286,13 +213,6 @@ const Page = () => {
         signatureBytes
       );
       console.log(checksignature);
-      // const txnResponse = await signer.signTransaction({
-      //   to: addressERC20,
-      //   data: txData,
-      //   gasLimit: ethers.utils.hexlify(7920027),
-      //   nonce: await signer.getTransactionCount(),
-      //   value: 0,
-      // });
       const txn = await contractOwnerSafe.execTransaction(
         addressERC20,
         0,
@@ -621,6 +541,24 @@ const Page = () => {
       console.error("Claim by Dave safe failed:", error);
     }
   };
+  const [data, setData] = useState({});
+  useEffect(() => {
+    setData({
+      addressOwnerSafe,
+      addressBobSafe,
+      addressCarolSafe,
+      addressDaveSafe,
+      addressERC20,
+      addressEncryptedERC20,
+      setAddressOwnerSafe,
+      setAddressBobSafe,
+      setAddressCarolSafe,
+      setAddressDaveSafe,
+      setAddressERC20,
+      setAddressEncryptedERC20,
+      handleChange,
+    });
+  }, []);
 
   return (
     <main className="md:p-8 p-2 px-6 flex flex-col items-center gap-3 justify-center w-full">
@@ -631,21 +569,29 @@ const Page = () => {
             {/* <p className="text-muted-foreground">Check Balance</p> */}
           </div>
           <div className="">
-            <Button onClick={checkBalance} className="w-full min-w-[200px]">
-              Check Balance
-            </Button>
+            <CheckBalance
+              addressBobSafe={addressBobSafe}
+              addressCarolSafe={addressCarolSafe}
+              addressDaveSafe={addressDaveSafe}
+              addressERC20={addressERC20}
+              addressEncryptedERC20={addressEncryptedERC20}
+              addressOwnerSafe={addressOwnerSafe}
+            />
           </div>
         </div>
 
         <div className="flex items-center justify-between border-b pb-6">
           <div className="col-span-5">
             <p className="font-semibold text-xl"> Step 1: </p>
-            <p className="text-muted-foreground">Deploy erc20 normal token</p>
+            <p className="text-muted-foreground">
+              Add ERC20 contract addresses
+            </p>
           </div>
           <div className="">
-            <Button onClick={handleDeploy} className="w-full min-w-[200px]">
-              Deploy ERC token
-            </Button>
+            {/* <Button onClick={handleDeploy} className="w-full min-w-[200px]">
+              Add Addresses
+            </Button> */}
+            <AddAddress data={data} />
           </div>
         </div>
 
