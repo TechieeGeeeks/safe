@@ -14,6 +14,7 @@ import {
 } from "@/utils/utility";
 import { CheckBalance } from "@/components/checkbalance";
 import { AddAddress } from "@/components/AddAddresses";
+import { Cross, CrossIcon, X } from "lucide-react";
 
 const Page = () => {
   const { authenticated, ready } = usePrivy();
@@ -26,6 +27,7 @@ const Page = () => {
   const [contractDaveSafe, setContractDaveSafe] = useState(null);
   const [contractERC20, setContractERC20] = useState(null);
   const [contractEncryptedERC20, setContractEncryptedERC20] = useState(null);
+  const [isAddressesVisible, setIsAddressesVisible] = useState(false);
 
   const [addressOwnerSafe, setAddressOwnerSafe] = useState(
     "0xD543bA793b37ebB2e91F259ff842591F8b615c44"
@@ -563,10 +565,16 @@ const Page = () => {
   return (
     <main className="md:p-8 p-2 px-6 flex flex-col items-center gap-3 justify-center w-full">
       <div className="max-w-6xl w-full flex flex-col justify-between gap-6">
-        <div className="flex justify-between items-center border-b pb-6 mt-14">
+        {/* <div className="flex justify-between items-center pb-6 mt-14">
           <div className="col-span-5">
             <p className="font-semibold text-xl"> Check Balance </p>
-            {/* <p className="text-muted-foreground">Check Balance</p> */}
+            <p className="text-muted-foreground">Check Balance</p>
+          </div>
+        </div> */}
+
+        <div className="flex items-center justify-between border-b pb-6 mt-14">
+          <div className="col-span-5">
+            <p className="font-semibold text-xl"> Owner&apos;s Procedure </p>
           </div>
           <div className="">
             <CheckBalance
@@ -588,12 +596,98 @@ const Page = () => {
             </p>
           </div>
           <div className="">
-            {/* <Button onClick={handleDeploy} className="w-full min-w-[200px]">
-              Add Addresses
-            </Button> */}
-            <AddAddress data={data} />
+            {isAddressesVisible ? (
+              <div
+                className="border rounded-full p-3 cursor-pointer"
+                onClick={() => setIsAddressesVisible(false)}
+              >
+                <X />
+              </div>
+            ) : (
+              <Button
+                onClick={() => {
+                  setIsAddressesVisible(true);
+                }}
+                className="w-full min-w-[200px]"
+              >
+                Add Addresses
+              </Button>
+            )}
           </div>
         </div>
+
+        {isAddressesVisible && (
+          <div className="space-y-3">
+            <div>
+              <label>
+                Owner Safe Address:
+                <input
+                  type="text"
+                  value={addressOwnerSafe}
+                  onChange={(e) => handleChange(data.setAddressOwnerSafe, e)}
+                  className="w-full bg-muted border p-2"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Bob Safe Address:
+                <input
+                  type="text"
+                  value={addressBobSafe}
+                  onChange={(e) => handleChange(data.setAddressBobSafe, e)}
+                  className="w-full bg-muted border p-2"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Carol Safe Address:
+                <input
+                  type="text"
+                  value={addressCarolSafe}
+                  onChange={(e) => handleChange(data.setAddressCarolSafe, e)}
+                  className="w-full bg-muted border p-2"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Dave Safe Address:
+                <input
+                  type="text"
+                  value={addressDaveSafe}
+                  onChange={(e) => handleChange(data.setAddressDaveSafe, e)}
+                  className="w-full bg-muted border p-2"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                ERC20 Address:
+                <input
+                  type="text"
+                  value={addressERC20}
+                  onChange={(e) => handleChange(data.setAddressERC20, e)}
+                  className="w-full bg-muted border p-2"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Encrypted ERC20 Address:
+                <input
+                  type="text"
+                  value={addressEncryptedERC20}
+                  onChange={(e) =>
+                    handleChange(data.setAddressEncryptedERC20, e)
+                  }
+                  className="w-full bg-muted border p-2"
+                />
+              </label>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between border-b pb-6">
           <div className="col-span-5">
@@ -629,8 +723,24 @@ const Page = () => {
 
         <div className="flex items-center justify-between border-b pb-6">
           <div className="col-span-5">
+            <p className="font-semibold text-xl"> Beneficiary Procedure </p>
+          </div>
+          <div className="">
+            <CheckBalance
+              addressBobSafe={addressBobSafe}
+              addressCarolSafe={addressCarolSafe}
+              addressDaveSafe={addressDaveSafe}
+              addressERC20={addressERC20}
+              addressEncryptedERC20={addressEncryptedERC20}
+              addressOwnerSafe={addressOwnerSafe}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between border-b pb-6">
+          <div className="col-span-5">
             <p className="font-semibold text-xl"> Step 4: </p>
-            <p className="text-muted-foreground">Bob's Claim</p>
+            <p className="text-muted-foreground">Bob&apos;s Claim</p>
           </div>
           <div className="">
             <Button onClick={bobTransaction} className="w-full min-w-[200px]">
@@ -641,8 +751,8 @@ const Page = () => {
 
         <div className="flex items-center justify-between border-b pb-6">
           <div className="col-span-5">
-            <p className="font-semibold text-xl"> Step 4: </p>
-            <p className="text-muted-foreground">Carol's Claim</p>
+            <p className="font-semibold text-xl"> Step 5: </p>
+            <p className="text-muted-foreground">Carol&apos;s Claim</p>
           </div>
           <div className="">
             <Button onClick={carolTransaction} className="w-full min-w-[200px]">
@@ -651,10 +761,10 @@ const Page = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-b pb-6">
+        <div className="flex items-center justify-between pb-6">
           <div className="col-span-5">
-            <p className="font-semibold text-xl"> Step 4: </p>
-            <p className="text-muted-foreground">Dave's Claim</p>
+            <p className="font-semibold text-xl"> Step 6: </p>
+            <p className="text-muted-foreground">Dave&apos;s Claim</p>
           </div>
           <div className="">
             <Button onClick={daveTransaction} className="min-w-[200px]">
@@ -663,7 +773,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <div className="mt-9 w-full">
+      {/* <div className="mt-9 w-full">
         <p>Logs: </p>
         <div>
           {showLogs && (
@@ -676,7 +786,7 @@ const Page = () => {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </main>
   );
 };

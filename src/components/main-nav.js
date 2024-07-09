@@ -64,18 +64,18 @@ function MainNav({ items }) {
         {authenticated && (
           <>
             <div className="flex gap-4 items-center">
-              <Link href={"/owner"}>
+              {/* <Link href={"/owner"}>
                 {" "}
                 <div className="p-2 rounded-lg text-sm cursor-pointer hover:text-primary">
-                  <p className="">Owner</p>
+                  <p className="">Steps</p>
                 </div>
-              </Link>
+              </Link> */}
 
-              <div className="p-2 rounded-lg text-sm cursor-pointer hover:text-primary">
+              {/* <div className="p-2 rounded-lg text-sm cursor-pointer hover:text-primary">
                 <Link href={"befiniciary"}>
                   <p>Beneficiary</p>
                 </Link>
-              </div>
+              </div> */}
               <div
                 className="p-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/80"
                 onClick={logout}

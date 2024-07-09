@@ -40,12 +40,12 @@ const Mint = () => {
 
             <div className="flex justify-center mt-3">
               <div className="flex gap-4">
-                <Link href={"owner"}>
-                  <Button>Owner</Button>
+                <Link href={"/steps"}>
+                  <Button>See Steps</Button>
                 </Link>
-                <Link href={"befiniciary"}>
-                  <Button variant="outline">Beneficiary</Button>
-                </Link>
+                {/* <Link href={"befiniciary"}> */}
+                  <Button variant="outline">Logout</Button>
+                {/* </Link> */}
               </div>
             </div>
           </section>

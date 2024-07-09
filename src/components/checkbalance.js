@@ -122,7 +122,7 @@ export function CheckBalance({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-full min-w-[200px]" onClick={checkBalance}>
+        <Button className="w-full min-w-[200px]" variant='outline' onClick={checkBalance}>
           Check Balance
         </Button>
       </AlertDialogTrigger>
