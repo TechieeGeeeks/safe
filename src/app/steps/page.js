@@ -13,7 +13,7 @@ import {
   safeApproveHash,
 } from "@/utils/utility";
 import { CheckBalance } from "@/components/checkbalance";
-import { AddAddress } from "@/components/AddAddresses";
+// import { AddAddress } from "@/components/AddAddresses";
 import { Cross, CrossIcon, X } from "lucide-react";
 
 const Page = () => {
