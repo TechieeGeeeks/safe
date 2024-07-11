@@ -77,10 +77,10 @@ function MainNav({ items }) {
                 </Link>
               </div> */}
               <div
-                className="p-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/80"
+                className="p-2 bg-red-500 text-white rounded-lg text-sm hover:bg-primary/80"
                 onClick={logout}
               >
-                <p className="">Logout</p>
+                <p className="">{formattedAddress}</p>
               </div>
             </div>
           </>
