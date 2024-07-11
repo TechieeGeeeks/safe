@@ -23,7 +23,6 @@ export function CheckBalance({
   addressERC20,
   addressEncryptedERC20,
 }) {
-
   const { authenticated, ready } = usePrivy();
   const { wallets } = useWallets();
   const w0 = wallets[0];
@@ -78,10 +77,10 @@ export function CheckBalance({
   };
 
   const checkBalance = async () => {
-    
     const provider = await w0?.getEthersProvider();
     const signer = await provider?.getSigner();
     try {
+      console.log(addressOwnerSafe)
       const erc20 = new Contract(addressERC20, erc20abi, signer);
       const ownerSafeBalance = await erc20.balanceOf(addressOwnerSafe);
       const bobSafeBalance = await erc20.balanceOf(addressBobSafe);
@@ -117,12 +116,26 @@ export function CheckBalance({
     if (authenticated && ready && w0) {
       getContracts();
     }
-  }, [w0, ready, authenticated]);
+  }, [
+    w0,
+    ready,
+    authenticated,
+    addressBobSafe,
+    addressCarolSafe,
+    addressDaveSafe,
+    addressOwnerSafe,
+    addressERC20,
+    addressEncryptedERC20,
+  ]);
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-full min-w-[200px]" variant='outline' onClick={checkBalance}>
+        <Button
+          className="w-full min-w-[200px]"
+          variant="outline"
+          onClick={checkBalance}
+        >
           Check Balance
         </Button>
       </AlertDialogTrigger>

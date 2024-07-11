@@ -28,6 +28,10 @@ const Page = () => {
   const [contractERC20, setContractERC20] = useState(null);
   const [contractEncryptedERC20, setContractEncryptedERC20] = useState(null);
   const [isAddressesVisible, setIsAddressesVisible] = useState(false);
+  const [bobAmount, setBobAmount] = useState();
+  const [carolAmount, setCarolAmount] = useState();
+  const [daveAmount, setDaveAmount] = useState();
+  const [isDeposit, setIsDeposit] = useState(false);
 
   const [addressOwnerSafe, setAddressOwnerSafe] = useState(
     "0xD543bA793b37ebB2e91F259ff842591F8b615c44"
@@ -262,7 +266,8 @@ const Page = () => {
     );
     let fnSelector = "0xf98aa085";
 
-    const amount = 1000000;
+    const amount = Number(bobAmount) + Number(carolAmount) + Number(daveAmount);
+    // const amount = 1000000;
     const fhevmInstance = await getInstance();
     const token = fhevmInstance.getPublicKey(addressEncryptedERC20) || {
       signature: "",
@@ -270,9 +275,15 @@ const Page = () => {
     };
     console.log(token);
 
-    const data1 = [addressBobSafe, fhevmInstance.encrypt32(10000)];
-    const data2 = [addressCarolSafe, fhevmInstance.encrypt32(30000)];
-    const data3 = [addressDaveSafe, fhevmInstance.encrypt32(960000)];
+    const data1 = [addressBobSafe, fhevmInstance.encrypt32(Number(bobAmount))];
+    const data2 = [
+      addressCarolSafe,
+      fhevmInstance.encrypt32(Number(carolAmount)),
+    ];
+    const data3 = [
+      addressDaveSafe,
+      fhevmInstance.encrypt32(Number(daveAmount)),
+    ];
 
     // Create an array of depositstruct
     const depositData = [data1, data2, data3];
@@ -721,15 +732,81 @@ const Page = () => {
             <p className="font-semibold text-xl"> Step 3: </p>
             <p className="text-muted-foreground">Deposit & distribute</p>
           </div>
-          <div className="">
-            <Button
+          <div className="flex">
+            {/* <Button
               onClick={depositAndDistribute}
               className="w-full min-w-[200px]"
             >
               Deposit & Distribute
-            </Button>{" "}
+            </Button>{" "} */}
+
+            {isDeposit ? (
+              <div
+                className="border rounded-full p-3 cursor-pointer"
+                onClick={() => setIsDeposit(false)}
+              >
+                <X />
+              </div>
+            ) : (
+              <Button
+                onClick={() => {
+                  setIsDeposit(true);
+                }}
+                className="w-full min-w-[200px]"
+              >
+                Deposit & Distribute
+              </Button>
+            )}
           </div>
         </div>
+
+        {isDeposit && (
+          <div>
+            <div className=" gap-3 rounded-lg grid grid-cols-3">
+              <div>
+                <label>
+                  Bob's Amount:
+                  <input
+                    type="text"
+                    value={bobAmount}
+                    onChange={(e) => setBobAmount(e.target.value)}
+                    className="w-full bg-muted border p-2"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Carol's Amount:
+                  <input
+                    type="text"
+                    value={carolAmount}
+                    onChange={(e) => setCarolAmount(e.target.value)}
+                    className="w-full bg-muted border p-2"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Dave's Amount:
+                  <input
+                    type="text"
+                    value={daveAmount}
+                    onChange={(e) => setDaveAmount(e.target.value)}
+                    className="w-full bg-muted border p-2"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="flex w-full items-center justify-end mt-4 mb-20">
+              <Button
+                className="w-full max-w-[200px]"
+                onClick={depositAndDistribute}
+              >
+                Deposit
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between border-b pb-6">
           <div className="col-span-5">
