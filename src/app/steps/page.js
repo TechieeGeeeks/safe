@@ -86,7 +86,17 @@ const Page = () => {
     if (authenticated && ready && w0) {
       getContracts();
     }
-  }, [w0, ready, authenticated]);
+  }, [
+    w0,
+    ready,
+    authenticated,
+    addressOwnerSafe,
+    addressBobSafe,
+    addressCarolSafe,
+    addressDaveSafe,
+    addressERC20,
+    addressEncryptedERC20,
+  ]);
 
   const logs = {
     addressOwnerSafe,
