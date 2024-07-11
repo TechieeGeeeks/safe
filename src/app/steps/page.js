@@ -765,7 +765,7 @@ const Page = () => {
             <div className=" gap-3 rounded-lg grid grid-cols-3">
               <div>
                 <label>
-                  Bob's Amount:
+                  Bob&apos;s Amount:
                   <input
                     type="text"
                     value={bobAmount}
@@ -776,7 +776,7 @@ const Page = () => {
               </div>
               <div>
                 <label>
-                  Carol's Amount:
+                  Carol&apos;s Amount:
                   <input
                     type="text"
                     value={carolAmount}
@@ -787,7 +787,7 @@ const Page = () => {
               </div>
               <div>
                 <label>
-                  Dave's Amount:
+                  Dave&apos;s Amount:
                   <input
                     type="text"
                     value={daveAmount}
