@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { encryptederc20abi, erc20abi, safeabi } from "@/contracts/data";
-import { getInstance } from "@/utils/fhevm";
+import { getInstance, getSignature, getTokenSignature } from "@/utils/fhevm";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Contract } from "ethers";
 import { defaultAbiCoder } from "ethers/lib/utils";
@@ -14,7 +14,7 @@ import {
 } from "@/utils/utility";
 import { CheckBalance } from "@/components/checkbalance";
 // import { AddAddress } from "@/components/AddAddresses";
-import { Cross, CrossIcon, X } from "lucide-react";
+import { X } from "lucide-react";
 
 const Page = () => {
   const { authenticated, ready } = usePrivy();
@@ -32,37 +32,31 @@ const Page = () => {
   const [carolAmount, setCarolAmount] = useState();
   const [daveAmount, setDaveAmount] = useState();
   const [isDeposit, setIsDeposit] = useState(false);
+  const [decryptedBalance, setDecryptedBalance] = useState("0");
 
   const [addressOwnerSafe, setAddressOwnerSafe] = useState(
-    "0xD543bA793b37ebB2e91F259ff842591F8b615c44"
+    "0xB9555dfC438ca4d5b821393A69BDD67Ad31Ac861"
   );
   const [addressBobSafe, setAddressBobSafe] = useState(
-    "0x0FFC127F9e4fFBbf9086602905204Ea7cF5B5A97"
+    "0x041907AD40FDD8169fe776c938fE49d5aa499709"
   );
   const [addressCarolSafe, setAddressCarolSafe] = useState(
-    "0x5B3A40338d7ccA4f551e523543360ADa17b9AaB4"
+    "0x32150fc524cde67a08c7c7c31C56741541Fd7de7"
   );
   const [addressDaveSafe, setAddressDaveSafe] = useState(
-    "0x3CfA76a8eE3DADE60dcEaA0D412E7EDA00A6ab8f"
+    "0x7892cc035EEa3a8fed33695F166c384cE19E1275"
   );
   const [addressERC20, setAddressERC20] = useState(
-    "0xa095308F69c5e9076818D0530d1b89b31497CF5E"
+    "0x4B40BC951E9435A4913F8cB7A611226d7B21243D"
   );
   const [addressEncryptedERC20, setAddressEncryptedERC20] = useState(
-    "0xA13cB51D908d61cd8e65E8B4f2Ccc4776e725A5f"
+    "0xBF9787a89aA4434E2b60562B4e4E6f4B9e48A93b"
   );
 
   const handleChange = (setter, e) => {
     console.log(e.target.value);
     setter(e.target.value);
   };
-
-  // const addressOwnerSafe = "0xD543bA793b37ebB2e91F259ff842591F8b615c44";
-  // const addressBobSafe = "0x0FFC127F9e4fFBbf9086602905204Ea7cF5B5A97";
-  // const addressCarolSafe = "0x5B3A40338d7ccA4f551e523543360ADa17b9AaB4";
-  // const addressDaveSafe = "0x3CfA76a8eE3DADE60dcEaA0D412E7EDA00A6ab8f";
-  // const addressERC20 = "0xa095308F69c5e9076818D0530d1b89b31497CF5E";
-  // const addressEncryptedERC20 = "0xA13cB51D908d61cd8e65E8B4f2Ccc4776e725A5f";
 
   const getContracts = async () => {
     const provider = await w0?.getEthersProvider();
@@ -84,6 +78,34 @@ const Page = () => {
     setContractDaveSafe(daveSafe);
     setContractERC20(erc20);
     setContractEncryptedERC20(encryptedERC20);
+  };
+
+  const balanceOfEncryptedErc20 = async () => {
+    try {
+      const provider = await w0?.getEthersProvider();
+      const signer = await provider?.getSigner();
+      const encryptedERC20 = new Contract(
+        addressEncryptedERC20,
+        encryptederc20abi,
+        signer
+      );
+      const fhevmInstance = await getInstance();
+      console.log(fhevmInstance);
+      const token = await getSignature(
+        addressEncryptedERC20,
+        w0.address,
+        fhevmInstance
+      );
+      const balance = await encryptedERC20.balanceOf(token.publicKey);
+      // console.log(balance);
+      const decrytedBalance = await fhevmInstance
+        .decrypt(addressEncryptedERC20, balance.toString())
+        .toString();
+      console.log(decryptedBalance);
+      setDecryptedBalance(decrytedBalance);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -592,6 +614,11 @@ const Page = () => {
             <p className="text-muted-foreground">Check Balance</p>
           </div>
         </div> */}
+
+        <div className="flex items-center gap-3">
+          <Button onClick={balanceOfEncryptedErc20}>Fetch Balance</Button>
+          <p className="text-2xl">{decryptedBalance}</p>
+        </div>
 
         <div className="flex items-center justify-between border-b pb-6 mt-14">
           <div className="col-span-5">

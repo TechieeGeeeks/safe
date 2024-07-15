@@ -28,6 +28,7 @@ export const createFhevmInstance = async () => {
   });
   const decoded = defaultAbiCoder.decode(["bytes"], ret);
   const publicKey = decoded[0];
+  // console.log(publicKey)
   const instance = await createInstance({ chainId, publicKey });
   console.log("created instance");
   return instance;
@@ -37,4 +38,53 @@ export const getInstance = async () => {
   await init();
   const instance = await createFhevmInstance();
   return instance;
+};
+
+export const getTokenSignature = async (contractAddress, signer) => {
+  const eip712Domain = {
+    // This defines the network, in this case, Gentry Testnet.
+    chainId: 9090,
+    // Give a user-friendly name to the specific contract you're signing for.
+    // MUST match the string in contract constructor (EIP712Modifier).
+    name: "Authorization token",
+    // // Add a verifying contract to make sure you're establishing contracts with the proper entity.
+    verifyingContract: contractAddress,
+    // This identifies the latest version.
+    // MUST match the version in contract constructor (EIP712Modifier).
+    version: "1",
+  };
+  const instance = await getInstance();
+
+  const reencryption = instance.generatePublicKey(eip712Domain);
+
+  const signature = await signer._signTypedData(
+    reencryption.eip712.domain,
+    { Reencrypt: reencryption.eip712.types.Reencrypt },
+    reencryption.eip712.message
+  );
+  instance.setSignature(contractAddress, signature);
+
+  const publicKey = instance.getPublicKey(contractAddress).publicKey;
+  return { signature, publicKey };
+};
+
+export const getSignature = async (contractAddress, userAddress, instance) => {
+  // const instance = await getInstance();
+  if (instance.hasKeypair(contractAddress)) {
+    return instance.getPublicKey(contractAddress);
+  } else {
+    const { publicKey, eip712 } = instance.generatePublicKey({
+      chainId: 9090,
+      name: "Authorization token",
+      version: "1",
+      verifyingContract: contractAddress,
+    });
+    const params = [userAddress, JSON.stringify(eip712)];
+    const signature = await window.ethereum.request({
+      method: "eth_signTypedData_v4",
+      params,
+    });
+    instance.setSignature(contractAddress, signature);
+    return { signature, publicKey };
+  }
 };
