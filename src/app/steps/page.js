@@ -33,25 +33,33 @@ const Page = () => {
   const [daveAmount, setDaveAmount] = useState();
   const [isDeposit, setIsDeposit] = useState(false);
   const [decryptedBalance, setDecryptedBalance] = useState("0");
+  const [toAddress, setToAddress] = useState("");
 
   const [addressOwnerSafe, setAddressOwnerSafe] = useState(
-    "0xB9555dfC438ca4d5b821393A69BDD67Ad31Ac861"
+    "0x7C5FfE434a6C930B1290517FeD7Eb24B9A276267"
   );
   const [addressBobSafe, setAddressBobSafe] = useState(
-    "0x041907AD40FDD8169fe776c938fE49d5aa499709"
+    "0x7f78c61F235a43d836b555F08032d30e75105De4"
   );
   const [addressCarolSafe, setAddressCarolSafe] = useState(
-    "0x32150fc524cde67a08c7c7c31C56741541Fd7de7"
+    "0x58739b37401e717654705561525e2b026C532717"
   );
   const [addressDaveSafe, setAddressDaveSafe] = useState(
-    "0x7892cc035EEa3a8fed33695F166c384cE19E1275"
+    "0x5b1B09Bf5355a8ab9725BF895De8F961346e674b"
   );
   const [addressERC20, setAddressERC20] = useState(
-    "0x4B40BC951E9435A4913F8cB7A611226d7B21243D"
+    "0x222695029f4943248eA24136b7A34742A1ffb306"
   );
   const [addressEncryptedERC20, setAddressEncryptedERC20] = useState(
-    "0xBF9787a89aA4434E2b60562B4e4E6f4B9e48A93b"
+    "0x7be58630062a38Bd3e3b80170BD33c4F06888DD1"
   );
+
+  // Owner Safe address: 0x7C5FfE434a6C930B1290517FeD7Eb24B9A276267
+  // Bob Safe address: 0x7f78c61F235a43d836b555F08032d30e75105De4
+  // Carol Safe address: 0x58739b37401e717654705561525e2b026C532717
+  // Dave Safe address: 0x5b1B09Bf5355a8ab9725BF895De8F961346e674b
+  // ERC20 address: 0x222695029f4943248eA24136b7A34742A1ffb306
+  // EncryptedERC20 address: 0x7be58630062a38Bd3e3b80170BD33c4F06888DD1
 
   const handleChange = (setter, e) => {
     console.log(e.target.value);
@@ -96,12 +104,15 @@ const Page = () => {
         w0.address,
         fhevmInstance
       );
-      const balance = await encryptedERC20.balanceOf(token.publicKey);
+      const balance = await encryptedERC20.balanceOf(
+        token.publicKey,
+        toAddress
+      );
       // console.log(balance);
       const decrytedBalance = await fhevmInstance
         .decrypt(addressEncryptedERC20, balance.toString())
         .toString();
-      console.log(decryptedBalance);
+      // console.log(decryptedBalance);
       setDecryptedBalance(decrytedBalance);
     } catch (error) {
       console.log(error);
@@ -616,6 +627,12 @@ const Page = () => {
         </div> */}
 
         <div className="flex items-center gap-3">
+          <input
+            type="text"
+            value={toAddress}
+            onChange={(e) => setToAddress(e.target.value)}
+            className="w-full bg-muted border p-2"
+          />
           <Button onClick={balanceOfEncryptedErc20}>Fetch Balance</Button>
           <p className="text-2xl">{decryptedBalance}</p>
         </div>

@@ -1452,6 +1452,11 @@ export const encryptederc20abi = [
         name: "publicKey",
         type: "bytes32",
       },
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
     ],
     name: "balanceOf",
     outputs: [
